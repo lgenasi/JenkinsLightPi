@@ -1,5 +1,6 @@
 #!/usr/bin/python 
 import wiringpi2
+import time
 
 def setUpPin(name, pin):
 	print ("Using GPIO pin:"  + str(pin) + " as '" + name + "'.")
@@ -24,8 +25,10 @@ def illuminatePassing(passing, pinConfig):
 	else:
 		setLEDs(pinConfig, {"success": 0, "failure": 0})
 
-def illuminateBuilding(building, pinConfig):
-	if building:
-		setLEDs(pinConfig, {"building": 1})
-	else:
-		setLEDs(pinConfig, {"building": 0})
+def illuminateBuilding(building, pinConfig, pollingFrequency):
+	while building and pollingFrequency > 0:
+		setLEDs(pinConfig, {"success": 0, "failure": 0})
+		time.sleep(1)
+		setLEDs(pinConfig, {"success": 1, "failure": 1})
+		time.sleep(3)
+		pollingFrequency = pollingFrequency - 4

@@ -3,17 +3,18 @@ import sys, sched, time, jenkins_poller, config_loader, status_checker, console_
 
 def pollAndReportOnUrls(sc, config):
 	status = jenkins_poller.pollUrls(config["urlPrefix"])
-	
-	# Report last completed build color
-	passing = status_checker.isPassing(status["lastResult"])
-	console_logger.logPassing(config["jobName"], passing)
-	pin_handler.illuminatePassing(passing, config["pins"])
-	
+
 	# Report building status
 	building = status_checker.isBuilding(status["building"])
 	console_logger.logBuilding(config["jobName"], building)
-	pin_handler.illuminateBuilding(building, config["pins"])
+	pin_handler.illuminateBuilding(building, config["pins"], config["frequency"])
 
+	if not building:
+		# Report last completed build color
+		passing = status_checker.isPassing(status["lastResult"])
+		console_logger.logPassing(config["jobName"], passing)
+		pin_handler.illuminatePassing(passing, config["pins"])
+	
 	# Reschedule the same job
 	if sc is not None:
 		sc.enter(config["frequency"], 1, pollAndReportOnUrls, (sc, config))
@@ -46,4 +47,4 @@ try:
 except:
 	config = config_loader.load(sys.argv[1])
 	print("Some sort of exception occurred. Turning off all LEDs...")
-	pin_handler.setLEDs(config["pins"], {"success": 0, "failure": 0, "building": 0})
+	pin_handler.setLEDs(config["pins"], {"success": 0, "failure": 0})

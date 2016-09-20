@@ -2,7 +2,6 @@
 	"jobName": "P Feature -> Portal Smoke Tests",
 	"pins": {
 		"success": 2,
-		"building": 4,
 		"failure": 3
 	},
 	"urlPrefix": [
